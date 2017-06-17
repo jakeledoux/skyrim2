@@ -1,0 +1,37 @@
+# Value, Effectiveness, ID, Name
+[WEAPONS]
+5	2	dagger_shiv	Shiv
+10	4	dagger_iron	Iron Dagger
+13	8	sword_iron	Ancient Nord Sword
+5	8	sword_ceremony	Ceremonial Sword
+235	11	sword_elven	Elven Sword
+410	12	sword_glass	Glass Sword
+720	13	sword_ebony	Ebony Sword
+1250	14	sword_daedric	Daedric Sword
+1500	15	sword_bone	Dragonbone Sword
+
+30	6	bow_long	Long Bow
+50	7	bow_hunting	Hunting Bow
+45	8	bow_ancient	Ancient Nord Bow
+90	9	bow_imperial	Imperial Bow
+150	10	bow_orc	Orcish Bow
+580	13	bow_nord	Nordic Bow
+470	13	bow_elf	Elven Bow
+2500	19	bow_daedric	Daedric Bow
+2725	20	bow_bone	Dragonbone Bow
+
+99999	1	fists	Bare Fists
+
+[AID]
+1	1	sweet_roll	Sweetroll
+1000	20	king_goose	The King's Goose
+67	20	health_potion	Potion of Health
+145	40	health_draught	Draught of Health
+226	60	health_solution	Solution of Health
+311	80	health_philter	Philter of Health
+398	100	health_elixir	Elixir of Health
+
+[ARMOR]
+0	0	nothing	Nothing
+1	1	rags	Tattered Rags
+3000	90	armor_bone	Dragonbone Armor
