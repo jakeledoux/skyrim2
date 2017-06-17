@@ -1,6 +1,6 @@
 # Value, Effectiveness, ID, Name
 [WEAPONS]
-5	2	dagger_shiv	Shiv
+5	3	dagger_shiv	Shiv
 10	4	dagger_iron	Iron Dagger
 13	8	sword_iron	Ancient Nord Sword
 5	8	sword_ceremony	Ceremonial Sword
@@ -20,7 +20,7 @@
 2500	19	bow_daedric	Daedric Bow
 2725	20	bow_bone	Dragonbone Bow
 
-99999	1	fists	Bare Fists
+99999	2	fists	Bare Fists
 
 [AID]
 1	1	sweet_roll	Sweetroll
