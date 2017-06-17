@@ -2,6 +2,5 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-data/
-save.json
-art.py
+data/save.corn
+data/art.py
