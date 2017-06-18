@@ -4,10 +4,10 @@
 # SKYRIM 2: THE SCROLL IS NOT YOUNG
 # Copyright (c) 2017 Jake Ledoux All Rights Reserved.
 
-import os, time, sys, random, copy, json
+import os, time, sys, random, copy, json, time
 from msvcrt import getch # Keypresses on Windows. Cross-platform later.
 from colorama import init, Fore, Back, Style
-from data import termsize
+from data import termsize, art
 
 # Getting keypresses for menus
 def getkey():
@@ -479,7 +479,7 @@ def reward(amount, name=None, silent=False):
 		 	border[5] = "═"+border[5]
 		print(prefix+Back.YELLOW+Fore.BLACK+border[0]+Style.RESET_ALL)
 		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2]+Style.RESET_ALL)
-		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+Style.BRIGHT+Fore.WHITE+outtext+Style.DIM+Fore.BLACK+border[2]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+Style.BRIGHT+Fore.WHITE+outtext+Style.NORMAL+Fore.BLACK+border[2]+Style.RESET_ALL)
 		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2]+Style.RESET_ALL)
 		print(prefix+Back.YELLOW+Fore.BLACK+border[4]+border[6]+"Press enter."+border[6]+border[5]+Style.RESET_ALL)
 
@@ -534,6 +534,11 @@ class char:
 
 # Catch-all class where I put non-character related data
 class stats:
+	dfc = {}
+	heal = {}
+	names = {}
+	dmg = {}
+	values = {}
 	enemies = [ # Database of enemies and their stats
 			{'name' : 'Bear', 'hp' : [20,20], 'dmg' : 30, 'dfc' : 5},
 			{'name' : 'Tree Monkey', 'hp' : [3,3], 'dmg' : 5, 'dfc' : 0},
@@ -550,12 +555,90 @@ init()
 
 # INTRO
 if '-nointro' not in sys.argv: # Check if the script was run with -nointro
+	prefix = ""
+	for i in range(int(round(termsize.getTerminalSize()[1]/2))-1):
+		prefix += "\n"
+	for i in range(int(round((termsize.getTerminalSize()[0]-30)/2))):
+		prefix += " "
 	clear()
-	print("Bethesda Softworks presents...")
-	time.sleep(3)
-	print("\n\nSKYRIM 2: THE SCROLL IS NOT YOUNG")
+	time.sleep(1)
+	print(prefix+"........ ......... ........")
+	time.sleep(.2)
+	clear()
+	print(prefix+"bethesda softworks presents...")
+	time.sleep(.2)
+	clear()
+	print(prefix+"BETHESDA SOFTWORKS PRESENTS...")
 	time.sleep(2)
+	clear()
+	print(prefix+"bethesda softworks presents...")
+	time.sleep(.2)
+	clear()
+	print(prefix+"........ ......... ........")
+	time.sleep(.2)
+	clear()
+	time.sleep(2)
+
+	prefix = ""
+	prefix2 = ""
+
+	for i in range(int(round(termsize.getTerminalSize()[1]/2))-art.logo[3]):
+		prefix += "\n"
+	for i in range(int(round(termsize.getTerminalSize()[0]/2))-art.logo[2]):
+		prefix2 += " "
+	clear()
+	print(prefix)
+	for i in art.logo[0].split("\n"):
+		print(prefix2+Style.BRIGHT+Fore.BLACK+i+Style.RESET_ALL)
+	time.sleep(.2)
+	clear()
+	print(prefix)
+	for i in art.logo[0].split("\n"):
+		print(prefix2+Style.DIM+Fore.WHITE+i+Style.RESET_ALL)
+	time.sleep(.2)
+	clear()
+	print(prefix)
+	for i in art.logo[1].split("\n"):
+		print(prefix2+Style.NORMAL+Fore.WHITE+i+Style.RESET_ALL)
+	time.sleep(.2)
+	clear()
+	print(prefix)
+	for i in art.logo[1].split("\n"):
+		print(prefix2+Style.BRIGHT+Fore.WHITE+i+Style.RESET_ALL)
+	time.sleep(2)
+	prefix2 = ""
+	for i in range(int(round(termsize.getTerminalSize()[0]/2))-5):
+		prefix2 += " "
+	print(prefix2,end="")
 	enter()
+	prefix = ""
+	prefix2 = ""
+
+	for i in range(int(round(termsize.getTerminalSize()[1]/2))-art.logo[3]):
+		prefix += "\n"
+	for i in range(int(round(termsize.getTerminalSize()[0]/2))-art.logo[2]):
+		prefix2 += " "
+	print(prefix)
+	for i in art.logo[1].split("\n"): # 1
+		print(prefix2+Style.BRIGHT+Fore.WHITE+i+Style.RESET_ALL)
+	time.sleep(.2)
+	clear()
+	print(prefix)
+	for i in art.logo[1].split("\n"): # 2
+		print(prefix2+Style.NORMAL+Fore.WHITE+i+Style.RESET_ALL)
+	time.sleep(.2)
+	clear()
+	print(prefix)
+	for i in art.logo[0].split("\n"): # 3
+		print(prefix2+Style.DIM+Fore.WHITE+i+Style.RESET_ALL)
+	time.sleep(.2)
+	clear()
+	print(prefix)
+	for i in art.logo[0].split("\n"): # 4
+		print(prefix2+Style.BRIGHT+Fore.BLACK+i+Style.RESET_ALL)
+	time.sleep(.2)
+	clear()
+	time.sleep(2)
 
 # GAME LOOP
 menu_item = 0
