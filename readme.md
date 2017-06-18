@@ -8,9 +8,14 @@
 ##### Dialogue Sample
 ![Screenshot 2 failed to load](http://i.imgur.com/kjSkIXA.png)
 
+##FAQ
 >Why the name?
 
 Well the game itself is very Elder Scrolls-esque, and I wanted to choose something funny to emphasize that I don't take this project very seriously. Skyrim of course, is the fifth game in a series, and there are some people who somehow don't know that, so I thought it's kind of funny.
+
+>Won't Bethesda not like you using their name and trademarks?
+
+Sue me.
 
 >Your code is confusing.
 
