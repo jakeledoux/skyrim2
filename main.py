@@ -534,11 +534,6 @@ class char:
 
 # Catch-all class where I put non-character related data
 class stats:
-	dmg = {'fists' : 2, 'sword_iron': 6} # The damage stats of each weapon
-	heal = {'potion' : 20, 'sweet_roll' : 2}
-	dfc = {'rags' : 1, 'nothing' : 0} # Effectiveness of armor from 0 to 100
-	names = {}
-	values = {}
 	enemies = [ # Database of enemies and their stats
 			{'name' : 'Bear', 'hp' : [20,20], 'dmg' : 30, 'dfc' : 5},
 			{'name' : 'Tree Monkey', 'hp' : [3,3], 'dmg' : 5, 'dfc' : 0},
