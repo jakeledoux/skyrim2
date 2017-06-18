@@ -6,6 +6,8 @@
 
 import os, time, sys, random, copy, json
 from msvcrt import getch # Keypresses on Windows. Cross-platform later.
+from colorama import init, Fore, Back, Style
+from data import termsize
 
 # Getting keypresses for menus
 def getkey():
@@ -127,7 +129,7 @@ def load():
 					stats.values[i.split("\t")[2]] = int(i.split("\t")[0])
 					stats.dfc[i.split("\t")[2]] = int(i.split("\t")[1])
 					stats.names[i.split("\t")[2]] = i.split("\t")[3]
-	if os.path.isfile("data/save.corn"):
+	if os.path.isfile("data/save.corn") and "-noload" not in sys.argv:
 		with open("data/save.corn","r") as f:
 			char.quest_active = json.loads(f.readline().strip())
 			char.hp = json.loads(f.readline().strip())
@@ -183,9 +185,9 @@ def dialogue(name, speech, menu_list = None):
 			if menu_list[x] in ['Back','Quit','Run','Cancel']:
 				menu_list2[x] += "\n "
 			if x == menu_item:
-				menu_list2[x] += "\t> "+menu_list[x]
+				menu_list2[x] += "\t"+Back.WHITE+Fore.BLACK+menu_list[x]+Style.RESET_ALL
 			else:
-				menu_list2[x] += "\t  "+menu_list[x]
+				menu_list2[x] += "\t"+menu_list[x]
 			print(menu_list2[x])
 
 		# Get and handle keypresses
@@ -314,8 +316,9 @@ def use_aid():
 		else:
 			break
 
-def enter():
-	print("Press enter.")
+def enter(silent=False):
+	if not silent:
+		print("Press enter.")
 	key = None
 	while key != 'enter':
 		key = getkey()
@@ -456,21 +459,61 @@ def die():
 def reward(amount, name=None, silent=False):
 	if not silent:
 		clear()
+		border = ["╔══","║  ","  ║","","╚══","═╝",""]
 		if name == None:
-			print("You have been rewarded "+str(amount)+" gold!")
+			outtext = "You have been rewarded "+str(amount)+" gold!"
 		else:
-			print(name+" has rewarded you "+str(amount)+" gold!")
-		enter()
+			outtext = name+" has rewarded you "+str(amount)+" gold!"
+		prefix = ""
+		for i in range(int(round((termsize.getTerminalSize()[1]/2)))-3):
+			print()
+		for i in range(int(round((termsize.getTerminalSize()[0]/2)-(len(outtext)/2)))-6):
+			prefix += " "
+		for i in range(len(outtext)):
+			border[0] += "═"
+			border[3] += " "
+		for i in range(int(round((len(outtext)-len("Press enter."))/2))):
+			border[6] += "═"
+		border[0] += "══╗"
+		for i in range(len(border[0]) - len(border[4]+border[6]+"Press enter."+border[6]+border[5])):
+		 	border[5] = "═"+border[5]
+		print(prefix+Back.YELLOW+Fore.BLACK+border[0]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+Style.BRIGHT+Fore.WHITE+outtext+Style.DIM+Fore.BLACK+border[2]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[4]+border[6]+"Press enter."+border[6]+border[5]+Style.RESET_ALL)
+
+		enter(True)
 	char.gold += amount
 
 def reward_item(giftid,amount=1,name=None, silent=False):
 	if not silent:
 		clear()
+		border = ["╔══","║  ","  ║","","╚══","╝",""]
 		if name == None:
-			print("You have been given ["+get_name(giftid)+"] x"+str(amount)+".")
+			outtext = "You have been given ["+get_name(giftid)+"] x"+str(amount)+"."
 		else:
-			print(name+" has given you ["+get_name(giftid)+"] x"+str(amount)+".")
-		enter()
+			outtext = name+" has given you ["+get_name(giftid)+"] x"+str(amount)+"."
+		prefix = ""
+		for i in range(int(round((termsize.getTerminalSize()[1]/2)))-3):
+			print()
+		for i in range(int(round((termsize.getTerminalSize()[0]/2)-(len(outtext)/2)))-6):
+			prefix += " "
+		for i in range(len(outtext)):
+			border[0] += "═"
+			border[3] += " "
+		for i in range(int(round((len(outtext)-len("Press enter."))/2))):
+			border[6] += "═"
+		border[0] += "══╗"
+		for i in range(len(border[0]) - len(border[4]+border[6]+"Press enter."+border[6]+border[5])):
+		 	border[5] = "═"+border[5]
+		print(prefix+Back.YELLOW+Fore.BLACK+border[0]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+Style.BRIGHT+Fore.WHITE+outtext+Style.DIM+Fore.BLACK+border[2]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[4]+border[6]+"Press enter."+border[6]+border[5]+Style.RESET_ALL)
+
+		enter(True)
 	if giftid in char.bag:
 		char.bag[giftid] += amount
 	else:
@@ -504,8 +547,11 @@ class stats:
 	time = [7,0] # Hours, Minutes
 	shopbag = {}
 
-# LOAD GAME
+# Initiate Game
+if os.name == "nt":
+	os.system("title SKYRIM 2")
 load()
+init()
 
 # INTRO
 if '-nointro' not in sys.argv: # Check if the script was run with -nointro
@@ -520,8 +566,10 @@ if '-nointro' not in sys.argv: # Check if the script was run with -nointro
 menu_item = 0
 while True:
 	# Scene selection
-	scenes = ['Shop','Wilderness','Quest','Inventory','Quit']
-	scene = menu(scenes, 'Gold: '+str(char.gold)+'\nHP: '+str(char.hp[0])+'/'+str(char.hp[1])+'\nXP: '+str(char.xp)+'/1000\nLevel: '+str(char.lvl),
+	scenes = ['Shop','Wilderness','The King\'s Castle','Inventory','Quit']
+	scene = menu(scenes, 'Gold: '+Style.BRIGHT+Fore.YELLOW+str(char.gold)+Style.RESET_ALL+
+	'\nHP: '+Fore.RED+Style.BRIGHT+str(char.hp[0])+'/'+str(char.hp[1])+Style.RESET_ALL+
+	'\nXP: '+Fore.CYAN+Style.BRIGHT+str(char.xp)+'/1000'+Style.RESET_ALL+'\nLevel: '+str(char.lvl),
 	get_time(), menu_item=menu_item)
 
 	scene_active = True # When this is false, the loop returns to the main menu
@@ -686,7 +734,7 @@ while True:
 		else:
 			combat(copy.deepcopy(stats.enemies[random.randrange(len(stats.enemies))]))
 
-	elif scene == 'Quest':
+	elif scene == 'The King\'s Castle':
 		advance_time(30)
 		if char.quest_active == -1:
 			clear()
