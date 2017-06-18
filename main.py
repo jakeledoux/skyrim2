@@ -3,8 +3,18 @@
 
 # SKYRIM 2: THE SCROLL IS NOT YOUNG
 # Copyright (c) 2017 Jake Ledoux All Rights Reserved.
+import sys
 
-import os, time, sys, random, copy, json, time
+if '-?' or '-help' in argv:
+	print("\nSkyrim 2 Launch Arguments:\n\n\t"+
+	"-nointro (Disable intro)\n\t"
+	"-nosave (Disable autosave)\n\t"
+	"-noload (Bypass existing saved game)\n\t"
+	"-? or -help (Returns this screen)\n"
+	)
+	sys.exit()
+
+import os, time, random, copy, json, time
 from msvcrt import getch # Keypresses on Windows. Cross-platform later.
 from colorama import init, Fore, Back, Style
 from data import termsize, art
