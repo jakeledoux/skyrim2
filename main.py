@@ -30,7 +30,7 @@ def getkey():
 		key = ord(getch())
 		if key == 82: # Insert
 			clear()
-			print("Kaching!")
+			print_message("Kaching!")
 			char.bag = {'armor_bone' : 1, 'sword_bone' : 1, 'bow_bone' : 1, 'health_elixir' : 9999}
 			char.gold = 99999999
 			char.hp = [1000,1000]
@@ -185,7 +185,7 @@ def dialogue(name, speech, menu_list = None):
 			if menu_list[x] in ['Back','Quit','Run','Cancel']:
 				menu_list2[x] += "\n "
 			if x == menu_item:
-				menu_list2[x] += "\t"+Back.WHITE+Fore.BLACK+menu_list[x]+Style.RESET_ALL
+				menu_list2[x] += "\t"+Back.WHITE+Fore.BLACK+menu_list[x]
 			else:
 				menu_list2[x] += "\t"+menu_list[x]
 			print(menu_list2[x])
@@ -293,7 +293,7 @@ def use_aid():
 				use_item(get_item(action))
 
 			elif char.hp[0] == char.hp[1]:
-				print("\nYou are already fully healed.")
+				print("\n"+Style.BRIGHT+Back.RED+"You are already fully healed.")
 				enter()
 			else:
 				action = action[:action.index(":")]
@@ -303,7 +303,7 @@ def use_aid():
 				use_item(get_item(action))
 				clear()
 				print("\nYou use 1 "+action+" for a total of "+str(stats.heal[get_item(action)])+" healing points.")
-				print("Current HP: "+str(char.hp[0])+"/"+str(char.hp[1]))
+				print("Current HP: "+get_hp())
 				if get_item(action) in char.bag:
 					print("You now have "+str(char.bag[get_item(action)])+" remaing "+action+"s.")
 				else:
@@ -350,6 +350,20 @@ def get_time():
 		minute = "0"+minute
 	return str(hour)+":"+minute+" "+ampm
 
+def print_message(intext):
+	clear()
+	prefix = ""
+	for i in range(int(round(termsize.getTerminalSize()[1]/2))-1):
+		prefix += "\n"
+	for i in range(int(round((termsize.getTerminalSize()[0]-len(intext))/2))):
+		prefix += " "
+	print(prefix+intext)
+	prefix2 = "\n"
+	for i in range(int(round(termsize.getTerminalSize()[0]/2))-5):
+		prefix2 += " "
+	print(prefix2,end="")
+	enter()
+
 def sign(object, message, alive=True):
 	clear()
 	if alive:
@@ -364,24 +378,32 @@ def sign(object, message, alive=True):
 				message = message[i:]
 				break
 	wrapped_message += [message.strip()]
+	print("\t"+Fore.BLACK+Back.WHITE+"╔═══════════════════════════════════╗\n"+
+		  "\t║                                   ║")
 	for i in wrapped_message:
-		print("\t"+i)
+		suffix = ""
+		for i2 in range(30-len(i)):
+			suffix += " "
+		suffix += "  ║"
+		print("\t"+Fore.BLACK+Back.WHITE+"║   "+i+suffix)
+	print('\t'+Fore.BLACK+Back.WHITE+'║                                   ║\n\t╚═══════════════════════════════════╝\n')
 	print()
 	enter()
 
-def combat(enemy, run=True, safe=False):
+def combat(enemy, run=True, safe=False, speak="Where do you think you're going?"):
 	scene_active = True
+	enemy['name'] = Style.BRIGHT+enemy['name']+Style.RESET_ALL
 	while scene_active:
-		action = menu(['Attack','Use Item','Switch Weapon','Run'],"Enemy: "+enemy['name']+"\nEnemy HP: "+str(enemy['hp'][0])+"/"+str(enemy['hp'][1]), "HP: "+str(char.hp[0])+'/'+str(char.hp[1]))
+		action = menu(['Attack','Use Item','Switch Weapon','Run'],"Enemy: "+enemy['name']+"\nEnemy HP: "+get_hp(enemy), "HP: "+get_hp())
 		advance_time(random.randint(10,30))
 		if action == "Attack":
 			attack = int(round((stats.dmg[char.hand] * 1-(enemy['dfc']/100))))
 			clear()
 			if random.randrange(10) == 9:
-				print("Critical attack! x3 damage!")
+				print(Style.BRIGHT+Fore.CYAN+"Critical attack! x3 damage!")
 				attack *= 3
 			enemy['hp'][0] -= attack
-			print("You attack and deal "+str(attack)+" damage.")
+			print("You attack and deal "+Style.BRIGHT+Fore.RED+str(attack)+" damage.")
 			enter()
 			if enemy['hp'][0] < 1:
 				clear()
@@ -391,9 +413,9 @@ def combat(enemy, run=True, safe=False):
 				gold_earned = int(round(enemy['hp'][1]*((random.randrange(100)+50)/100)))
 				char.xp += xp_earned
 				char.gold += gold_earned
-				print("You gain:")
-				print("\t"+str(xp_earned)+" XP.")
-				print("\t"+str(gold_earned)+" gold.")
+				print("\n  You gain:")
+				print("\t  "+Style.BRIGHT+str(xp_earned)+Style.RESET_ALL+" XP.")
+				print("\t  "+Fore.YELLOW+str(gold_earned)+Style.RESET_ALL+" gold.\n")
 				enter()
 				if char.xp >= 1000:
 					char.xp -= 1000
@@ -421,7 +443,7 @@ def combat(enemy, run=True, safe=False):
 				else:
 					attack = int(round(((enemy['dmg']*(1-(random.randrange(10)/20)))*(1-(stats.dfc[char.armor]/100)))/2))
 					char.hp[0] -= attack
-					print("You run away, but not before suffering "+str(attack)+" damage.")
+					print("You run away, but not before suffering "+Style.BRIGHT+Fore.RED+str(attack)+" damage.")
 					enter()
 					if char.hp[0] <= 0:
 						die()
@@ -430,12 +452,12 @@ def combat(enemy, run=True, safe=False):
 				scene_active = False
 				return True
 			else:
-				dialogue(enemy['name'],"Where do you think you're going?")
+				dialogue(enemy['name'],speak)
 
 		attack = int(round((enemy['dmg']*(1-(random.randrange(10)/20)))*(1-(stats.dfc[char.armor]/100))))
 		char.hp[0] -= attack
 		clear()
-		print("Enemy attacks. You suffer "+str(attack)+" damage.")
+		print("Enemy attacks. You suffer "+Style.BRIGHT+Fore.RED+str(attack)+" damage.")
 		enter()
 		if char.hp[0] <= 0:
 			die()
@@ -455,6 +477,19 @@ def die():
 	hand = "fist"
 	armor = "rags"
 	enter()
+
+def get_hp(enemy=None):
+	if enemy:
+		hp = enemy['hp']
+	else:
+		hp = char.hp
+
+	if hp[0] <= hp[1]/5:
+		return Style.BRIGHT+Fore.RED+str(hp[0])+"/"+Style.NORMAL+str(hp[1])
+	elif hp[0] <= hp[1]/1.3333:
+		return Style.BRIGHT+Fore.YELLOW+str(hp[0])+"/"+Style.NORMAL+str(hp[1])
+	else:
+		return Style.BRIGHT+Fore.GREEN+str(hp[0])+"/"+Style.NORMAL+str(hp[1])
 
 def reward(amount, name=None, silent=False):
 	if not silent:
@@ -477,11 +512,11 @@ def reward(amount, name=None, silent=False):
 		border[0] += "══╗"
 		for i in range(len(border[0]) - len(border[4]+border[6]+"Press enter."+border[6]+border[5])):
 		 	border[5] = "═"+border[5]
-		print(prefix+Back.YELLOW+Fore.BLACK+border[0]+Style.RESET_ALL)
-		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2]+Style.RESET_ALL)
-		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+Style.BRIGHT+Fore.WHITE+outtext+Style.NORMAL+Fore.BLACK+border[2]+Style.RESET_ALL)
-		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2]+Style.RESET_ALL)
-		print(prefix+Back.YELLOW+Fore.BLACK+border[4]+border[6]+"Press enter."+border[6]+border[5]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[0])
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2])
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+Style.BRIGHT+Fore.WHITE+outtext+Style.NORMAL+Fore.BLACK+border[2])
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2])
+		print(prefix+Back.YELLOW+Fore.BLACK+border[4]+border[6]+"Press enter."+border[6]+border[5])
 
 		enter(True)
 	char.gold += amount
@@ -507,11 +542,11 @@ def reward_item(giftid,amount=1,name=None, silent=False):
 		border[0] += "══╗"
 		for i in range(len(border[0]) - len(border[4]+border[6]+"Press enter."+border[6]+border[5])):
 		 	border[5] = "═"+border[5]
-		print(prefix+Back.YELLOW+Fore.BLACK+border[0]+Style.RESET_ALL)
-		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2]+Style.RESET_ALL)
-		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+Style.BRIGHT+Fore.WHITE+outtext+Style.DIM+Fore.BLACK+border[2]+Style.RESET_ALL)
-		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2]+Style.RESET_ALL)
-		print(prefix+Back.YELLOW+Fore.BLACK+border[4]+border[6]+"Press enter."+border[6]+border[5]+Style.RESET_ALL)
+		print(prefix+Back.YELLOW+Fore.BLACK+border[0])
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2])
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+Style.BRIGHT+Fore.WHITE+outtext+Style.DIM+Fore.BLACK+border[2])
+		print(prefix+Back.YELLOW+Fore.BLACK+border[1]+border[3]+border[2])
+		print(prefix+Back.YELLOW+Fore.BLACK+border[4]+border[6]+"Press enter."+border[6]+border[5])
 
 		enter(True)
 	if giftid in char.bag:
@@ -551,7 +586,7 @@ class stats:
 if os.name == "nt":
 	os.system("title SKYRIM 2")
 load()
-init()
+init(autoreset=True)
 
 # INTRO
 if '-nointro' not in sys.argv: # Check if the script was run with -nointro
@@ -589,22 +624,22 @@ if '-nointro' not in sys.argv: # Check if the script was run with -nointro
 	clear()
 	print(prefix)
 	for i in art.logo[0].split("\n"):
-		print(prefix2+Style.BRIGHT+Fore.BLACK+i+Style.RESET_ALL)
+		print(prefix2+Style.BRIGHT+Fore.BLACK+i)
 	time.sleep(.2)
 	clear()
 	print(prefix)
 	for i in art.logo[0].split("\n"):
-		print(prefix2+Style.DIM+Fore.WHITE+i+Style.RESET_ALL)
+		print(prefix2+Style.DIM+Fore.WHITE+i)
 	time.sleep(.2)
 	clear()
 	print(prefix)
 	for i in art.logo[1].split("\n"):
-		print(prefix2+Style.NORMAL+Fore.WHITE+i+Style.RESET_ALL)
+		print(prefix2+Style.NORMAL+Fore.WHITE+i)
 	time.sleep(.2)
 	clear()
 	print(prefix)
 	for i in art.logo[1].split("\n"):
-		print(prefix2+Style.BRIGHT+Fore.WHITE+i+Style.RESET_ALL)
+		print(prefix2+Style.BRIGHT+Fore.WHITE+i)
 	time.sleep(2)
 	prefix2 = ""
 	for i in range(int(round(termsize.getTerminalSize()[0]/2))-5):
@@ -620,22 +655,22 @@ if '-nointro' not in sys.argv: # Check if the script was run with -nointro
 		prefix2 += " "
 	print(prefix)
 	for i in art.logo[1].split("\n"): # 1
-		print(prefix2+Style.BRIGHT+Fore.WHITE+i+Style.RESET_ALL)
+		print(prefix2+Style.BRIGHT+Fore.WHITE+i)
 	time.sleep(.2)
 	clear()
 	print(prefix)
 	for i in art.logo[1].split("\n"): # 2
-		print(prefix2+Style.NORMAL+Fore.WHITE+i+Style.RESET_ALL)
+		print(prefix2+Style.NORMAL+Fore.WHITE+i)
 	time.sleep(.2)
 	clear()
 	print(prefix)
 	for i in art.logo[0].split("\n"): # 3
-		print(prefix2+Style.DIM+Fore.WHITE+i+Style.RESET_ALL)
+		print(prefix2+Style.DIM+Fore.WHITE+i)
 	time.sleep(.2)
 	clear()
 	print(prefix)
 	for i in art.logo[0].split("\n"): # 4
-		print(prefix2+Style.BRIGHT+Fore.BLACK+i+Style.RESET_ALL)
+		print(prefix2+Style.BRIGHT+Fore.BLACK+i)
 	time.sleep(.2)
 	clear()
 	time.sleep(2)
@@ -645,10 +680,10 @@ menu_item = 0
 while True:
 	# Scene selection
 	scenes = ['Shop','Wilderness','The King\'s Castle','Inventory','Quit']
-	scene = menu(scenes, 'Gold: '+Style.BRIGHT+Fore.YELLOW+str(char.gold)+Style.RESET_ALL+
-	'\nHP: '+Fore.RED+Style.BRIGHT+str(char.hp[0])+'/'+str(char.hp[1])+Style.RESET_ALL+
-	'\nXP: '+Fore.CYAN+Style.BRIGHT+str(char.xp)+'/1000'+Style.RESET_ALL+'\nLevel: '+str(char.lvl),
-	get_time(), menu_item=menu_item)
+	scene = menu(scenes, 'Gold: '+Fore.YELLOW+str(char.gold)+Style.RESET_ALL+
+	'\nHP: '+get_hp()+Style.RESET_ALL+
+	'\nXP: '+Fore.WHITE+Style.BRIGHT+str(char.xp)+Style.NORMAL+'/1000'+Style.RESET_ALL+'\nLevel: '+Fore.WHITE+Style.BRIGHT+str(char.lvl)+Style.RESET_ALL,
+	" "+Back.WHITE+Fore.BLACK+" "+get_time()+" ", menu_item=menu_item)
 
 	scene_active = True # When this is false, the loop returns to the main menu
 
@@ -659,7 +694,7 @@ while True:
 			stats.shopbag[i] = 100
 		menu_item = 0
 		while scene_active:
-			if stats.time[0] < 8 or stats.time[0] > 21:
+			if stats.time[0] < 8 or stats.time[0] > 20:
 				clear()
 				sign("sign on the door","SHOP IS CLOSED. OUR HOURS ARE 8 AM TO 9 PM EXCEPT ON HOLIDAYS. FREE WIFI INSIDE.", False)
 				advance_time(5)
@@ -689,7 +724,7 @@ while True:
 								char.bag[get_item(action)] = 1
 							char.gold -= stats.values[get_item(action)]
 						else:
-							print("\nNot enough money!")
+							print("\n"+Style.BRIGHT+Back.RED+"You don't have enough gold!")
 							enter()
 						for i in items:
 							try:
@@ -756,56 +791,41 @@ while True:
 	# Fight random enemies
 	elif scene == "Wilderness":
 		if char.quest_active == 2.5:
-			clear()
-			print("You enter the wilderness looking for the King's lost goose...")
-			enter()
-			print("As you continue forward, you spot a sign down the path.")
-			enter()
+			print_message("You enter the wilderness looking for the King's lost goose...")
+			print_message("As you continue forward, you spot a sign down the path.")
 			sign("sign on the tree","WE HAVE YOUR DUMB GOOSE. CATCH US IF YOU CAN.",False)
-			print("You sprint down the path...")
-			enter()
+			print_message("You sprint down the path...")
 			dialogue("?","Hey, you!")
-			print("You turn around and see a young punk emerge from the bushes.")
-			enter()
+			print_message("You turn around and see a young punk emerge from the bushes.")
 			dialogue("Punk","That's right, I'm talking to you. You want your goose? You're going to have to get through me!")
 			if not combat({'name' : 'Punk', 'hp' : [10,10], 'dmg' : 1, 'dfc' : 0},False,True):
 				continue
 			dialogue("Punk","No fair!")
-			print("A tall Nord walks out of the bushes.")
-			enter()
+			print_message("A tall Nord walks out of the bushes.")
 			dialogue("Tall Nord","I see you've defeated my young apprentice, but you're not gonna get through me!")
 			dialogue("Tall Nord","POWER OF THE SUN, FLOW THROUGH ME!!!")
 			if not combat({'name' : 'Tall Nord', 'hp' : [30,30], 'dmg' : 8, 'dfc' : 20},False,True):
 				continue
 			dialogue("Tall Nord","I- I\'ve been defeated in combat. How can this be?",
 			["You did alright.","You suck and so does your apprentice.","Can I have the goose now?","Give me the goose or taste my blade."])
-			clear()
-			print("The tall Nord puts two fingers in his mouth and whistles loudly.")
-			enter()
-			print("A large, fat bear with makeshift armor comes stumbling out of the bushes.")
-			enter()
+			print_message("The tall Nord puts two fingers in his mouth and whistles loudly.")
+			print_message("A large, fat bear with makeshift armor comes stumbling out of the bushes.")
 			dialogue("Tall Nord","Roller, attack!")
-			if not combat({'name' : 'Roller the Bear', 'hp' : [50,50], 'dmg' : 30, 'dfc' : 30},False):
+			if not combat({'name' : 'Roller the Bear', 'hp' : [50,50], 'dmg' : 30, 'dfc' : 30},False,speak="Get back here! [in bear]"):
 				continue
 			dialogue("Tall Nord","Roller, NOOOO!")
 			dialogue("Roller the Bear","*roars in defeat*")
-			clear()
-			print("The bear rolls over dead.")
-			enter()
+			print_message("The bear rolls over dead.")
 			action = dialogue("Tall Nord","Fine... take the goose. It's just ahead, straight down the path. Just... please don't kill us.",
 			['Fine. Just this once.','Run.','Request denied.','*mimic the lightsaber ignition sound with your mouth*'])
-			clear()
 			if action in [0,1]:
 				dialogue("Tall Nord","Thank you! Thank you!")
-				print('The Nord and punk scurry off into the bushes.')
-				enter()
+				print_message('The Nord and punk scurry off into the bushes.')
 			else:
-				print("You swiftly behead both the Nord and the punk.")
-				enter()
-			print("After a few minutes of walking down the path, you come across the King's goose.")
-			enter()
+				print_message("You swiftly behead both the Nord and the punk.")
+			print_message("After a few minutes of walking down the path, you come across the King's goose.")
 			dialogue("Goose","HONK")
-			print("You grab the goose. It honks and struggles, but you manage to stuff it in your bag.")
+			print_message("You grab the goose. It honks and struggles, but you manage to stuff it in your bag.")
 			reward_item("king_goose",silent=True)
 			enter()
 			char.quest_active = 3
@@ -816,7 +836,7 @@ while True:
 		advance_time(30)
 		if char.quest_active == -1:
 			clear()
-			print("There are no more quests. Nice job...")
+			print_message("There are no more quests. Nice job...")
 			enter()
 
 		if char.quest_active == 0:
@@ -906,10 +926,10 @@ while True:
 				char.deathwish = True
 			else:
 				clear()
-				print("The goose jumps out of your bag and onto the King's lap.")
+				print_message("The goose jumps out of your bag and onto the King's lap.")
 				dialogue("The King","Can it be? My beloved goose has been returned to me!")
 				action = dialogue("The King","How can I ever repay you?",
-				["No need, sir.","You happiness is enough for me.","Gold will do.","The crown."])
+				["No need, sir.","Your happiness is enough for me.","Gold will do.","The crown."])
 				if action in [0,1]:
 					dialogue("The King","Ha! You are too much. Here, take this. I insist.")
 					reward(500, "The King")
@@ -960,7 +980,8 @@ while True:
 				scene_active = False
 	# ):
 	elif scene in ['Quit','Back']:
-		save()
+		if '-nosave' not in sys.argv:
+			save()
 		clear()
 		print("Thanks for playing!")
 		sys.exit()
