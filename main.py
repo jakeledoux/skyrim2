@@ -5,14 +5,14 @@
 # Copyright (c) 2017 Jake Ledoux All Rights Reserved.
 import sys
 
-if '-?' or '-help' in argv:
-	print("\nSkyrim 2 Launch Arguments:\n\n\t"+
-	"-nointro (Disable intro)\n\t"
-	"-nosave (Disable autosave)\n\t"
-	"-noload (Bypass existing saved game)\n\t"
-	"-? or -help (Returns this screen)\n"
-	)
-	sys.exit()
+# if '-?' or '-help' in argv:
+# 	print("\nSkyrim 2 Launch Arguments:\n\n\t"+
+# 	"-nointro (Disable intro)\n\t"
+# 	"-nosave (Disable autosave)\n\t"
+# 	"-noload (Bypass existing saved game)\n\t"
+# 	"-? or -help (Returns this screen)\n"
+# 	)
+# 	sys.exit()
 
 import os, time, random, copy, json, time
 from msvcrt import getch # Keypresses on Windows. Cross-platform later.
