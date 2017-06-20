@@ -484,7 +484,7 @@ def die():
 	char.deathwish = False
 	if char.gold < 0:
 		char.gold = 0
-	hand = "fist"
+	hand = "fists"
 	armor = "rags"
 	enter()
 
@@ -945,12 +945,15 @@ while True:
 				if action in [0,1]:
 					dialogue("The King","Ha! You are too much. Here, take this. I insist.")
 					reward(500, "The King")
+					use_item("king_goose")
 				elif action == 2:
 					dialogue("The King","Hm. Well, at least you're honest.")
 					reward(200, "The King")
+					use_item("king_goose")
 				elif action ==3:
 					dialogue("The King","Soon perhaps. But that conversation is for another day. In the meantime, take this.")
 					reward(200, "The King")
+					use_item("king_goose")
 				char.quest_active = -1
 
 		if char.deathwish:
@@ -990,6 +993,7 @@ while True:
 				use_aid()
 			elif action == 'Back':
 				scene_active = False
+
 	# ):
 	elif scene in ['Quit','Back']:
 		if '-nosave' not in sys.argv:
