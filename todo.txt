@@ -1,0 +1,4 @@
+- Make bows require ammo
+- Add more armor types
+- Fix the store
+- Make the combat system more complex and interesting
