@@ -587,7 +587,9 @@ class stats:
 	enemies = [ # Database of enemies and their stats
 			{'name' : 'Bear', 'hp' : [20,20], 'dmg' : 30, 'dfc' : 5},
 			{'name' : 'Tree Monkey', 'hp' : [3,3], 'dmg' : 5, 'dfc' : 0},
-			{'name' : 'Wanderer', 'hp' : [10,10], 'dmg' : 20, 'dfc' : 30}
+			{'name' : 'Wanderer', 'hp' : [10,10], 'dmg' : 15, 'dfc' : 30},
+			{'name' : 'Dragonling', 'hp' : [15,15], 'dmg' : 18, 'dfc' : 10},
+			{'name' : 'Warlock', 'hp' : [50,50], 'dmg' : 35, 'dfc' : 30},
 	]
 	time = [7,0] # Hours, Minutes
 	shopbag = {}
