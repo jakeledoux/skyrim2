@@ -43,9 +43,9 @@ def getkey():
 			clear()
 			print_message("Kaching!")
 			char.bag = {'armor_bone' : 1, 'sword_bone' : 1, 'bow_bone' : 1, 'health_elixir' : 9999}
+			char.arrows = 1
 			char.gold = 99999999
 			char.hp = [1000,1000]
-			enter()
 		elif key == 80: #Down arrow
 			return 'down'
 		elif key == 72: #Up arrow
@@ -113,6 +113,7 @@ def save():
 		f.write(json.dumps(char.armor)+"\n")
 		f.write(json.dumps(char.bag)+"\n")
 		f.write(json.dumps(stats.time)+"\n")
+		f.write(json.dumps(char.arrows)+"\n")
 
 def load():
 	with open("data/db.corn","r") as f:
@@ -152,6 +153,7 @@ def load():
 			char.armor = json.loads(f.readline().strip())
 			char.bag = json.loads(f.readline().strip())
 			stats.time = json.loads(f.readline().strip())
+			char.arrows = json.loads(f.readline().strip())
 
 def dialogue(name, speech, menu_list = None):
 	menu_item = 0
@@ -237,7 +239,7 @@ def switch_weapon():
 				else:
 					weapons += [get_name(i)]
 		weapons += ['Back']
-		action = menu(weapons, "WEAPON SELECTION","E/Enter: Equip - F: Drop", special_f=True, menu_item=menu_item)
+		action = menu(weapons, Style.BRIGHT+"WEAPON SELECTION"+Style.RESET_ALL+"\n\nArrows: "+str(char.arrows),"E/Enter: Equip - F: Drop", special_f=True, menu_item=menu_item)
 		if action not in ['Cancel','Back']:
 
 			if "[ACTIVE]" in action:
@@ -407,15 +409,48 @@ def combat(enemy, run=True, safe=False, speak="Where do you think you're going?"
 	while scene_active:
 		action = menu(['Attack','Use Item','Switch Weapon','Run'],"Enemy: "+enemy['name']+"\nEnemy HP: "+get_hp(enemy), "HP: "+get_hp())
 		advance_time(random.randint(10,30))
+		critical_attack = False
 		if action == "Attack":
-			attack = int(round((stats.dmg[char.hand] * 1-(enemy['dfc']/100))))
-			clear()
-			if random.randrange(10) == 9:
-				print(Style.BRIGHT+Fore.CYAN+"Critical attack! x3 damage!")
-				attack *= 3
-			enemy['hp'][0] -= attack
-			print("You attack and deal "+Style.BRIGHT+Fore.RED+str(attack)+" damage.")
-			enter()
+			if "bow" in char.hand and char.arrows > 1:
+				critial_okay = True
+			elif "bow" not in hand:
+				crit_okay = True
+			else:
+				crit_okay = False
+			if random.randrange(10) and crit_okay:
+				print_message(Style.BRIGHT+Fore.CYAN+"Critical attack! x3 damage!")
+				critical_attack = True
+			if enemy['can_block'] and "bow" not in char.hand:
+				action = menu(hml,"Where do you aim?")
+				hit = hml.index(action) == random.randint(0,2)
+				if critical_attack:
+					hit = True
+				if hit:
+					print_message("Clean hit!")
+				else:
+					print_message("The enemy blocks your attack!")
+					hit = False
+			elif "bow" in char.hand:
+				if char.arrows > 0:
+					print_message("You fire your bow...")
+					bow_aim = random.randint(1,4)
+					if bow_aim <= enemy['size'] or critical_attack:
+						hit = True
+						print_message("...and hit the "+Style.BRIGHT+enemy['name']+"!")
+					else:
+						hit = False
+						print_message("...and miss.")
+				else:
+					hit = False
+					print_message("You're out of arrows!")
+
+			if hit:
+				attack = int(round((stats.dmg[char.hand] * 1-(enemy['dfc']/100))))
+				clear()
+				if critical_attack:
+					attack *= 3
+				enemy['hp'][0] -= attack
+				print_message("You deal "+Style.BRIGHT+Fore.RED+str(attack)+" damage.")
 			if enemy['hp'][0] < 1:
 				clear()
 				suffix = " is killed." if safe == False else " is defeated."
@@ -449,13 +484,11 @@ def combat(enemy, run=True, safe=False, speak="Where do you think you're going?"
 				clear()
 				escape = random.randrange(2)
 				if escape == 0:
-					print("You manage to run away safely.")
-					enter()
+					print_message("You manage to run away safely.")
 				else:
 					attack = int(round(((enemy['dmg']*(1-(random.randrange(10)/20)))*(1-(stats.dfc[char.armor]/100)))/2))
 					char.hp[0] -= attack
-					print("You run away, but not before suffering "+Style.BRIGHT+Fore.RED+str(attack)+" damage.")
-					enter()
+					print_message("You run away, but not before suffering "+Style.BRIGHT+Fore.RED+str(attack)+" damage.")
 					if char.hp[0] <= 0:
 						die()
 						scene_active = False
@@ -468,8 +501,7 @@ def combat(enemy, run=True, safe=False, speak="Where do you think you're going?"
 		attack = int(round((enemy['dmg']*(1-(random.randrange(10)/20)))*(1-(stats.dfc[char.armor]/100))))
 		char.hp[0] -= attack
 		clear()
-		print("Enemy attacks. You suffer "+Style.BRIGHT+Fore.RED+str(attack)+" damage.")
-		enter()
+		print_message("The enemy attacks! You suffer "+Style.BRIGHT+Fore.RED+str(attack)+" damage.")
 		if char.hp[0] <= 0:
 			die()
 			scene_active = False
@@ -487,7 +519,6 @@ def die():
 		char.gold = 0
 	hand = "fists"
 	armor = "rags"
-	enter()
 
 def get_hp(enemy=None):
 	if enemy:
@@ -565,6 +596,8 @@ def reward_item(giftid,amount=1,name=None, silent=False):
 	else:
 		char.bag[giftid] = amount
 
+hml =['High','Middle','Low']
+
 # All the character's data
 class char:
 	quest_active = 0
@@ -572,6 +605,7 @@ class char:
 	xp = 0
 	lvl = 0
 	gold = 0
+	arrows = 0
 	deathwish = False
 	hand = "fists"
 	armor = "rags"
@@ -585,12 +619,12 @@ class stats:
 	names = {}
 	dmg = {}
 	values = {}
-	enemies = [ # Database of enemies and their stats
-			{'name' : 'Bear', 'hp' : [20,20], 'dmg' : 30, 'dfc' : 5},
-			{'name' : 'Tree Monkey', 'hp' : [3,3], 'dmg' : 5, 'dfc' : 0},
-			{'name' : 'Wanderer', 'hp' : [10,10], 'dmg' : 15, 'dfc' : 30},
-			{'name' : 'Dragonling', 'hp' : [15,15], 'dmg' : 18, 'dfc' : 10},
-			{'name' : 'Warlock', 'hp' : [50,50], 'dmg' : 35, 'dfc' : 30},
+	enemies = [ # Database of enemies and their stats, Size is from 1 to 3
+			{'name' : 'Bear', 'hp' : [20,20], 'dmg' : 30, 'dfc' : 5, 'can_block': False, 'size': 3},
+			{'name' : 'Tree Monkey', 'hp' : [3,3], 'dmg' : 5, 'dfc' : 0, 'can_block': False, 'size': 1},
+			{'name' : 'Wanderer', 'hp' : [10,10], 'dmg' : 15, 'dfc' : 30, 'can_block': True, 'size': 2},
+			{'name' : 'Dragonling', 'hp' : [15,15], 'dmg' : 18, 'dfc' : 10, 'can_block': False, 'size': 2},
+			{'name' : 'Warlock', 'hp' : [50,50], 'dmg' : 35, 'dfc' : 30, 'can_block': True, 'size': 2},
 	]
 	time = [7,0] # Hours, Minutes
 	shopbag = {}
@@ -691,6 +725,13 @@ if '-nointro' not in sys.argv: # Check if the script was run with -nointro
 # GAME LOOP
 menu_item = 0
 while True:
+
+	# Double check item validities
+	if char.hand not in char.bag:
+		char.hand = "fists"
+		if char.armor not in char.bag:
+			char.armor = "nothing"
+
 	# Scene selection
 	scenes = ['Shop','Wilderness','The King\'s Castle','Inventory','Quit']
 	scene = menu(scenes, 'Gold: '+Fore.YELLOW+str(char.gold)+Style.RESET_ALL+
