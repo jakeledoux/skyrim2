@@ -413,7 +413,7 @@ def combat(enemy, run=True, safe=False, speak="Where do you think you're going?"
 		if action == "Attack":
 			if "bow" in char.hand and char.arrows > 1:
 				critial_okay = True
-			elif "bow" not in hand:
+			elif "bow" not in char.hand:
 				crit_okay = True
 			else:
 				crit_okay = False
@@ -767,7 +767,7 @@ while True:
 							advance_time(random.randint(8,15))
 							items = []
 							for i in stats.shopbag:
-								if i not in stats.dmg:
+								if i not in stats.dmg: or i in ['fists','nothing','king_goose']
 									continue
 								tabs = "\t\t" if len(get_name(i)) >= 12 else "\t\t\t"
 								items += [get_name(i)+tabs+"Value: "+str(stats.values[i])+"\tStock: "+str(stats.shopbag[i])]
@@ -805,7 +805,7 @@ while True:
 							advance_time(random.randint(8,15))
 							items = []
 							for i in stats.shopbag:
-								if i not in stats.dfc:
+								if i not in stats.dfc: or i in ['fists','nothing','king_goose']
 									continue
 								tabs = "\t\t" if len(get_name(i)) >= 12 else "\t\t\t"
 								items += [get_name(i)+tabs+"Value: "+str(stats.values[i])+"\tStock: "+str(stats.shopbag[i])]
@@ -843,7 +843,7 @@ while True:
 							advance_time(random.randint(8,15))
 							items = []
 							for i in stats.shopbag:
-								if i not in stats.heal:
+								if i not in stats.heal or i in ['fists','nothing','king_goose']:
 									continue
 								tabs = "\t\t" if len(get_name(i)) >= 12 else "\t\t\t"
 								items += [get_name(i)+tabs+"Value: "+str(stats.values[i])+"\tStock: "+str(stats.shopbag[i])]
@@ -940,20 +940,20 @@ while True:
 			dialogue("?","Hey, you!")
 			print_message("You turn around and see a young punk emerge from the bushes.")
 			dialogue("Punk","That's right, I'm talking to you. You want your goose? You're going to have to get through me!")
-			if not combat({'name' : 'Punk', 'hp' : [10,10], 'dmg' : 1, 'dfc' : 0},False,True):
+			if not combat({'name' : 'Punk', 'hp' : [10,10], 'dmg' : 1, 'dfc' : 0, 'can_block': True, 'size': 2},False,True):
 				continue
 			dialogue("Punk","No fair!")
 			print_message("A tall Nord walks out of the bushes.")
 			dialogue("Tall Nord","I see you've defeated my young apprentice, but you're not gonna get through me!")
 			dialogue("Tall Nord","POWER OF THE SUN, FLOW THROUGH ME!!!")
-			if not combat({'name' : 'Tall Nord', 'hp' : [30,30], 'dmg' : 8, 'dfc' : 20},False,True):
+			if not combat({'name' : 'Tall Nord', 'hp' : [30,30], 'dmg' : 8, 'dfc' : 20, 'can_block': True, 'size': 2},False,True):
 				continue
 			dialogue("Tall Nord","I- I\'ve been defeated in combat. How can this be?",
 			["You did alright.","You suck and so does your apprentice.","Can I have the goose now?","Give me the goose or taste my blade."])
 			print_message("The tall Nord puts two fingers in his mouth and whistles loudly.")
 			print_message("A large, fat bear with makeshift armor comes stumbling out of the bushes.")
 			dialogue("Tall Nord","Roller, attack!")
-			if not combat({'name' : 'Roller the Bear', 'hp' : [50,50], 'dmg' : 30, 'dfc' : 30},False,speak="Get back here! [in bear]"):
+			if not combat({'name' : 'Roller the Bear', 'hp' : [50,50], 'dmg' : 30, 'dfc' : 30, 'can_block': False, 'size': 3},False,speak="Get back here! [in bear]"):
 				continue
 			dialogue("Tall Nord","Roller, NOOOO!")
 			dialogue("Roller the Bear","*roars in defeat*")
@@ -1088,11 +1088,11 @@ while True:
 
 		if char.deathwish:
 			dialogue("The King","Guards! Arrest this man!")
-			if not combat({'name' : 'Royal Guard', 'hp' : [20,20], 'dmg' : 20, 'dfc' : 50}, False):
+			if not combat({'name' : 'Royal Guard', 'hp' : [20,20], 'dmg' : 20, 'dfc' : 50, 'can_block': True, 'size': 2}, False):
 				char.deathwish = False
 				continue
 			dialogue("Royal Guard Commander","Brother! He's...dead... YOU'LL PAY FOR THIS!!!")
-			if not combat({'name' : 'Royal Guard Commander', 'hp' : [30,30], 'dmg' : 30, 'dfc' : 50}, False):
+			if not combat({'name' : 'Royal Guard Commander', 'hp' : [30,30], 'dmg' : 30, 'dfc' : 50, 'can_block': True, 'size': 2}, False):
 				char.deathwish = False
 				continue
 			action = dialogue("The King","You've defeated my elite guards? This can't be! Please, spare me, and I'll let you take the throne.",
@@ -1108,7 +1108,7 @@ while True:
 				char.deathwish = False
 			elif action == 3:
 				dialogue("The King","So be it!")
-				if combat({'name' : 'The King', 'hp' : [30,30], 'dmg' : 50, 'dfc' : 50}, False):
+				if combat({'name' : 'The King', 'hp' : [30,30], 'dmg' : 50, 'dfc' : 50, 'can_block': True, 'size': 2}, False):
 					char.quest_active = -1
 				char.deathwish = False
 
