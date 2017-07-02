@@ -1,11 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.6.1
 # coding=utf-8
 
 # SKYRIM 2: THE SCROLL IS NOT YOUNG
 # Copyright (c) 2017 Jake Ledoux All Rights Reserved.
+
 import sys
 
-if '-?' in argv or '-help' in argv:
+if '-?' in sys.argv or '-help' in sys.argv:
 	print("\nSkyrim 2 Launch Arguments:\n\n\t"+
 	"-nointro (Disable intro)\n\t"
 	"-nosave (Disable autosave)\n\t"
@@ -476,8 +477,8 @@ def combat(enemy, run=True, safe=False, speak="Where do you think you're going?"
 
 def die():
 	clear()
-	print("YOU DIED.")
-	print("You have lost your items and 100 gold has been deducted from you stash.")
+	print_message(Fore.RED+Style.BRIGHT+"YOU DIED.")
+	print_message("You have lost your items and 100 gold has been deducted from you stash.")
 	char.bag = copy.deepcopy(char.default_bag)
 	char.hp[0] = char.hp[1]
 	char.gold -= 100
@@ -712,46 +713,131 @@ while True:
 				advance_time(5)
 				scene_active = False
 				continue
-			action = menu(['Buy','Sell','Back'], 'SHOP', menu_item=menu_item)
+			action = menu(['Buy','Sell','Back'], Style.BRIGHT+'SHOP', menu_item=menu_item)
 			if action == "Back":
 				scene_active = False
 			elif action == "Buy":
 				menu_item = 0
 				while True:
-					advance_time(random.randint(8,15))
-					items = []
-					for i in stats.shopbag:
-						items += [get_name(i)+" (Amount: "+str(stats.shopbag[i])+" / Value: "+str(stats.values[i])+")"]
-					items += ['Back']
-					action = menu(items, "SHOP: BUY\n\nShopkeeper's Gold: INFINITE\nYour Gold: "+str(char.gold),"E/Enter: Buy", menu_item=menu_item)
-					if action not in ['Cancel','Back']:
-						action = action[:action.index("(")].strip()
-						if char.gold >= stats.values[get_item(action)]:
-							stats.shopbag[get_item(action)] -= 1
-							if stats.shopbag[get_item(action)] < 1:
-								del stats.shopbag[get_item(action)]
-							try:
-								char.bag[get_item(action)] += 1
-							except:
-								char.bag[get_item(action)] = 1
-							char.gold -= stats.values[get_item(action)]
-						else:
-							print("\n"+Style.BRIGHT+Back.RED+"You don't have enough gold!")
-							enter()
-						for i in items:
-							try:
-								if i[:i.index("(")].strip() == action:
-									menu_item = items.index(i)
-									break
-							except:
-								if i == action:
-									menu_item = items.index(i)
-									break
-					else:
+					action = menu(['Weapons','Clothing','Aid','Back'], Style.BRIGHT+'SHOP: BUY', menu_item=menu_item)
+					if action == 'Weapons':
+						menu_item = 0
+						while True:
+							advance_time(random.randint(8,15))
+							items = []
+							for i in stats.shopbag:
+								if i not in stats.dmg:
+									continue
+								tabs = "\t\t" if len(get_name(i)) >= 12 else "\t\t\t"
+								items += [get_name(i)+tabs+"Value: "+str(stats.values[i])+"\tStock: "+str(stats.shopbag[i])]
+							items += ['Back']
+							action = menu(items, Style.BRIGHT+'SHOP: BUY: WEAPONS\n\nShopkeeper\'s Gold: '+Style.RESET_ALL+Fore.YELLOW+"INFINITE (WIP)"+Style.RESET_ALL+Style.BRIGHT+"\nYour Gold: "+Style.RESET_ALL+Fore.YELLOW+str(char.gold),"E/Enter: Buy", menu_item=menu_item)
+							if action not in ['Cancel','Back']:
+								action = action[:action.index("\t")].strip()
+								if char.gold >= stats.values[get_item(action)]:
+									stats.shopbag[get_item(action)] -= 1
+									if stats.shopbag[get_item(action)] < 1:
+										del stats.shopbag[get_item(action)]
+									try:
+										char.bag[get_item(action)] += 1
+									except:
+										char.bag[get_item(action)] = 1
+									char.gold -= stats.values[get_item(action)]
+								else:
+									print("\n"+Style.BRIGHT+Back.RED+"You don't have enough gold!")
+									enter()
+									for i in items:
+										try:
+											if i[:i.index("(")].strip() == action:
+												menu_item = items.index(i)
+												break
+										except:
+											if i == action:
+												menu_item = items.index(i)
+												break
+							else:
+								menu_item = 0
+								break
+					elif action == 'Clothing':
+						menu_item = 0
+						while True:
+							advance_time(random.randint(8,15))
+							items = []
+							for i in stats.shopbag:
+								if i not in stats.dfc:
+									continue
+								tabs = "\t\t" if len(get_name(i)) >= 12 else "\t\t\t"
+								items += [get_name(i)+tabs+"Value: "+str(stats.values[i])+"\tStock: "+str(stats.shopbag[i])]
+							items += ['Back']
+							action = menu(items, Style.BRIGHT+'SHOP: BUY: CLOTHING\n\nShopkeeper\'s Gold: '+Style.RESET_ALL+Fore.YELLOW+"INFINITE (WIP)"+Style.RESET_ALL+Style.BRIGHT+"\nYour Gold: "+Style.RESET_ALL+Fore.YELLOW+str(char.gold),"E/Enter: Buy", menu_item=menu_item)
+							if action not in ['Cancel','Back']:
+								action = action[:action.index("\t")].strip()
+								if char.gold >= stats.values[get_item(action)]:
+									stats.shopbag[get_item(action)] -= 1
+									if stats.shopbag[get_item(action)] < 1:
+										del stats.shopbag[get_item(action)]
+									try:
+										char.bag[get_item(action)] += 1
+									except:
+										char.bag[get_item(action)] = 1
+									char.gold -= stats.values[get_item(action)]
+								else:
+									print("\n"+Style.BRIGHT+Back.RED+"You don't have enough gold!")
+									enter()
+									for i in items:
+										try:
+											if i[:i.index("(")].strip() == action:
+												menu_item = items.index(i)
+												break
+										except:
+											if i == action:
+												menu_item = items.index(i)
+												break
+							else:
+								menu_item = 1
+								break
+					elif action == 'Aid':
+						menu_item = 0
+						while True:
+							advance_time(random.randint(8,15))
+							items = []
+							for i in stats.shopbag:
+								if i not in stats.heal:
+									continue
+								tabs = "\t\t" if len(get_name(i)) >= 12 else "\t\t\t"
+								items += [get_name(i)+tabs+"Value: "+str(stats.values[i])+"\tStock: "+str(stats.shopbag[i])]
+							items += ['Back']
+							action = menu(items, Style.BRIGHT+'SHOP: BUY: AID\n\nShopkeeper\'s Gold: '+Style.RESET_ALL+Fore.YELLOW+"INFINITE (WIP)"+Style.RESET_ALL+Style.BRIGHT+"\nYour Gold: "+Style.RESET_ALL+Fore.YELLOW+str(char.gold),"E/Enter: Buy", menu_item=menu_item)
+							if action not in ['Cancel','Back']:
+								action = action[:action.index("\t")].strip()
+								if char.gold >= stats.values[get_item(action)]:
+									stats.shopbag[get_item(action)] -= 1
+									if stats.shopbag[get_item(action)] < 1:
+										del stats.shopbag[get_item(action)]
+									try:
+										char.bag[get_item(action)] += 1
+									except:
+										char.bag[get_item(action)] = 1
+									char.gold -= stats.values[get_item(action)]
+								else:
+									print("\n"+Style.BRIGHT+Back.RED+"You don't have enough gold!")
+									enter()
+									for i in items:
+										try:
+											if i[:i.index("(")].strip() == action:
+												menu_item = items.index(i)
+												break
+										except:
+											if i == action:
+												menu_item = items.index(i)
+												break
+							else:
+								menu_item = 2
+								break
+					elif action == "Back":
 						menu_item = 0
 						break
 			elif action == "Sell":
-				menu_item = 0
 				while True:
 					advance_time(random.randint(8,15))
 					items = []
@@ -762,7 +848,7 @@ while True:
 							else:
 								items += [get_name(i)+" (Amount: "+str(char.bag[i])+" / Value: "+str(int(round(stats.values[i]*.7)))+")"]
 					items += ['Back']
-					action = menu(items, "SHOP: SELL\n\nShopkeeper's Gold: INFINITE\nYour Gold: "+str(char.gold),"E/Enter: Sell - F: Drop", special_f=True, menu_item=menu_item)
+					action = menu(items, Style.BRIGHT+"SHOP: SELL"+Style.RESET_ALL+"\n\nShopkeeper's Gold: INFINITE\nYour Gold: "+str(char.gold),"E/Enter: Sell - F: Drop", special_f=True, menu_item=menu_item)
 					if action not in ['Cancel','Back']:
 						try:
 							action = action[:action.index("[")].strip()
@@ -799,6 +885,9 @@ while True:
 					else:
 						menu_item = 1
 						break
+			elif action == 'Back':
+				scene_active = False
+				menu_item = 0
 
 	# Fight random enemies
 	elif scene == "Wilderness":
