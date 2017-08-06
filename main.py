@@ -15,7 +15,7 @@ if '-?' in sys.argv or '-help' in sys.argv:
 	)
 	sys.exit()
 
-import os, time, random, copy, json, time
+import os, time, random, copy, json
 from msvcrt import getch # Keypresses on Windows. Cross-platform later.
 from colorama import init, Fore, Back, Style
 from data import termsize, art
@@ -767,7 +767,7 @@ while True:
 							advance_time(random.randint(8,15))
 							items = []
 							for i in stats.shopbag:
-								if i not in stats.dmg: or i in ['fists','nothing','king_goose']
+								if i not in stats.dmg: or i in ['fists','nothing','king_goose']:
 									continue
 								tabs = "\t\t" if len(get_name(i)) >= 12 else "\t\t\t"
 								items += [get_name(i)+tabs+"Value: "+str(stats.values[i])+"\tStock: "+str(stats.shopbag[i])]
@@ -805,7 +805,7 @@ while True:
 							advance_time(random.randint(8,15))
 							items = []
 							for i in stats.shopbag:
-								if i not in stats.dfc: or i in ['fists','nothing','king_goose']
+								if i not in stats.dfc: or i in ['fists','nothing','king_goose']:
 									continue
 								tabs = "\t\t" if len(get_name(i)) >= 12 else "\t\t\t"
 								items += [get_name(i)+tabs+"Value: "+str(stats.values[i])+"\tStock: "+str(stats.shopbag[i])]
