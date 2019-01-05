@@ -1,3 +1,5 @@
+#### This was a learning project and is written pretty terribly.
+
 # SKYRIM 2: THE SCROLL IS NOT YOUNG
 
 #### Skyrim 2 is just a fun little project I'm doing in Python to practice making terminal games feel less like a terminal and more like, well... a game.
